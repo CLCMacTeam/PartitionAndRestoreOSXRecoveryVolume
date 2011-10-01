@@ -1,0 +1,20 @@
+I originally developed this script to run as a 'Post-Restore-Script' for PSU Blast Image Config, which I'm the lead developer of here:
+
+	<http://clc.its.psu.edu/UnivServices/itadmins/mac/blastimageconfig>
+
+System Requirements:
+
+- Mac OS X 10.7 (Lion) or later.
+- Sudo / root permissions.
+
+Purpose:
+
+This script does not require the use of PSU Blast Image Config, and can easily be adapted to different environments on OS X.
+
+It's intended to run after the main system image has been restored, then create (if one doesn't already exist) create a new 650 MB 'Recovery HD' partition, restore a pre-existing Recovery HD system disk image, and then change the partition type to 'Apple_Boot' via asr's 'adjust' verb.
+
+The script requires numerous input arguements, which are documented in the script's usage subroutine. The script must be ran with sudo or as the root user.
+
+If you make any cool/useful changes to this script, I'm always interested in hearing about them!
+
+- Justin Elliott
