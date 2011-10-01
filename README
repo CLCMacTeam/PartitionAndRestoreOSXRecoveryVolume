@@ -2,10 +2,17 @@ I originally developed this script to run as a 'Post-Restore-Script' for PSU Bla
 
 	<http://clc.its.psu.edu/UnivServices/itadmins/mac/blastimageconfig>
 
+
 System Requirements:
 
-- Mac OS X 10.7 (Lion) or later.
 - Sudo / root permissions.
+
+- Mac OS X 10.7 (Lion) or later.
+
+- A disk image of the Lion hidden 'Recovery HD' volume. Documentation on how to create it is located here: 
+
+		<http://clc.its.psu.edu/UnivServices/itadmins/mac/blastimageconfig/createasrrecoveryhdimage10.7>
+
 
 Purpose:
 
