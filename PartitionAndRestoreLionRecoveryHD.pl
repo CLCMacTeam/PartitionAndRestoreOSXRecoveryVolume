@@ -22,6 +22,8 @@
 use strict; # Declare strict checking on variable names, etc.
 use File::Basename; # Used to get this script's filename
 
+my ( $programName ) = basename($0);
+
 print "***\n$0 Script starting...\n";
 
 # ----------------------------------------------------------
@@ -50,10 +52,14 @@ if ( $< != 0 ) # $> = effective user id (euid)
 $_=`/usr/bin/sw_vers -productVersion`;
 /(\d+).(\d+).(\d+)/; # ie, $1="10" $2="6" $3="8"
 
-if ( ($1 < 10) && ($2 < 7) )
+print "This Mac appears to be running $1.$2.$3.\n\n";
+
+my $ErrMsg = "ERROR: Sorry, but this script only supports Mac OS X 10.7 and higher.\n\n***$programName exiting.\n";
+
+if ( ($1 < 10) || ( ( $1 == 10 ) && ( $2 < 7 ) ) )
 {
-	print "ERROR: Sorry, but this script only supports Mac OS X 10.7 and higher. This Mac appears to be running $1.$2.$3. Exiting.\n";
-	exit (-1);
+	print "$programName: $ErrMsg";
+	exit (-1);	
 }
 
 # ----------------------------------------------------------
@@ -64,7 +70,6 @@ my $argc;   # Declare variable $argc. This represents
             # the number of commandline parameters entered.
 
 my ( $dirName ) = dirname($0);
-my ( $programName ) = basename($0);
 my ( $fullPathToMe ) = $dirName . "\/" . $programName;
 my ( $recoveryHDdiskDevID ) = "";
 
@@ -176,6 +181,8 @@ elsif ( &createNewAppleBootPartition() != 0 )
 #	Verifying  ....10....20....30....40....50....60....70....80....90....100
 #	Remounting target volume...done
 # ----------------------------------------------------------
+
+print "recoveryHDdiskImagePath = '$recoveryHDdiskImagePath'\n";
 
 my $asrRestoreRecoveryHDvolume = system("/usr/sbin/asr --source \"" . $recoveryHDdiskImagePath . "\" --target " . $recoveryHDdiskDevID . " -erase --noprompt" ) >> 8;
 
