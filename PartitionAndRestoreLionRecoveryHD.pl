@@ -12,13 +12,6 @@
 # Use of this script for other purposes is permitted as long as credit to Justin Elliott is mentioned.
 # ----------------------------------------------------------
 
-# ----------------------------------------------------------
-# Revision History:
-# 2011-09-21: <jde6 [at] psu.edu> Initial Version
-# 2011-09-30: <jde6 [at] psu.edu> Added new variables for the Recovery HD disk image
-# 2011-10-01: <jde6 [at] psu.edu> Added check for running as 'root' effective userid
-# ----------------------------------------------------------
-
 use strict; # Declare strict checking on variable names, etc.
 use File::Basename; # Used to get this script's filename
 
@@ -27,21 +20,21 @@ my ( $programName ) = basename($0);
 print "***\n$0 Script starting...\n";
 
 # ----------------------------------------------------------
-# Specify the path to the Lion 'Recovery HD' System Image:
+# Specify the path to the OS X 'Recovery HD' System Image:
 # ----------------------------------------------------------
 
-# Look for the 'Lion-Recovery-HD.dmg' Recovery HD disk image in the main BIC 'RestoreImages' Directory, one directory back from this script.
+# Look for the 'RecoveryHD.dmg' Recovery HD disk image in the main BIC 'RestoreImages' Directory, one directory back from this script.
 # This path can be changed to anything that is valid in the terminal run with 'sudo' rights.
-my $recoveryHDdiskImageFileName = "Lion-Recovery-HD.dmg";
+my $recoveryHDdiskImageFileName = "RecoveryHD.dmg";
 my $recoveryHDdiskImagePath = dirname($0) . "/../RestoreImages/$recoveryHDdiskImageFileName";
 
 # ----------------------------------------------------------
 # Check that we're running as root (or via sudo)
 # ----------------------------------------------------------
 
-if ( $< != 0 ) # $> = effective user id (euid)
+if ( $< != 0 ) # $< = effective user id (euid)
 {
-        print "Sorry, but this script must be ran via 'sudo' or as the root user. Exiting.\n***\n";
+        print "Sorry, but this script must be executed via 'sudo' or as the root user. Exiting.\n***\n";
         exit -1;
 }
 
@@ -49,14 +42,17 @@ if ( $< != 0 ) # $> = effective user id (euid)
 # Check that we're running on 10.7 or later:
 # ----------------------------------------------------------
 
-$_=`/usr/bin/sw_vers -productVersion`;
-/(\d+).(\d+).(\d+)/; # ie, $1="10" $2="6" $3="8"
+my $fullOSXversionStr = `/usr/bin/sw_vers -productVersion`;
+$fullOSXversionStr =~ s/\s+//; # Remove all whitespace characters
 
-print "This Mac appears to be running $1.$2.$3.\n\n";
+# (my $MajorVersion, my $MinorVersion, my $BugFixVersion) = ("10","6","8"); # For Testing Purposes, to get the check to fail
+(my $MajorVersion, my $MinorVersion, my $BugFixVersion) = split('\.', $fullOSXversionStr);
+
+print "OS X System Version: Major = '$MajorVersion', Minor = '$MinorVersion', Bug Fix = '$BugFixVersion'\n";
 
 my $ErrMsg = "ERROR: Sorry, but this script only supports Mac OS X 10.7 and higher.\n\n***$programName exiting.\n";
 
-if ( ($1 < 10) || ( ( $1 == 10 ) && ( $2 < 7 ) ) )
+if ( ($MajorVersion < 10) || ( ( $MajorVersion == 10 ) && ( $MinorVersion < 7 ) ) )
 {
 	print "$programName: $ErrMsg";
 	exit (-1);	
@@ -188,7 +184,7 @@ my $asrRestoreRecoveryHDvolume = system("/usr/sbin/asr --source \"" . $recoveryH
 
 if ( $asrRestoreRecoveryHDvolume != 0 )
 {
-	print "ERROR! Failed to restore the Mac OS X Lion hidden 'Recovery HD' volume. Exiting.\n";
+	print "ERROR! Failed to restore the Mac OS X hidden 'Recovery HD' volume. Exiting.\n";
 	exit(-1);	
 }
 
@@ -245,7 +241,7 @@ my $asrChangePartitionType = system("/usr/sbin/asr adjust --target " . $recovery
 
 if ( $asrChangePartitionType != 0 )
 {
-	print "ERROR! Failed to restore the Mac OS X Lion hidden 'Recovery HD' volume. Exiting.\n";
+	print "ERROR! Failed to restore the Mac OS X hidden 'Recovery HD' volume. Exiting.\n";
 	exit(-1);	
 }
 
