@@ -20,15 +20,6 @@ my ( $programName ) = basename($0);
 print "***\n$0 Script starting...\n";
 
 # ----------------------------------------------------------
-# Specify the path to the OS X 'Recovery HD' System Image:
-# ----------------------------------------------------------
-
-# Look for the 'RecoveryHD.dmg' Recovery HD disk image in the main BIC 'RestoreImages' Directory, one directory back from this script.
-# This path can be changed to anything that is valid in the terminal run with 'sudo' rights.
-my $recoveryHDdiskImageFileName = "RecoveryHD.dmg";
-my $recoveryHDdiskImagePath = dirname($0) . "/../RestoreImages/$recoveryHDdiskImageFileName";
-
-# ----------------------------------------------------------
 # Check that we're running as root (or via sudo)
 # ----------------------------------------------------------
 
@@ -68,15 +59,43 @@ my $argc;   # Declare variable $argc. This represents
 my ( $dirName ) = dirname($0);
 my ( $fullPathToMe ) = $dirName . "\/" . $programName;
 my ( $recoveryHDdiskDevID ) = "";
+my ( $argvCountGoodFlag ) = 0; # FALSE
+my ( $onlyRecievedDiskVolumePath ) = 0; # FALSE
 
-$argc = @ARGV; # Get the number of commandline parameters
-if (@ARGV<4)
+$argc = @ARGV; # Get the number of command line parameters
+
+if ( ( @ARGV == 1 ) || ( @ARGV == 4 ) )
 {
-  # The number of commandline parameters is 4,
-  # so print a usage message.
+
+	$argvCountGoodFlag = 1; # TRUE
+	$onlyRecievedDiskVolumePath = 1;
+
+} else
+{
+
+	$argvCountGoodFlag = 0; # FALSE
+	$onlyRecievedDiskVolumePath = 0; # FALSE
+}
+
+if ( ! ( $argvCountGoodFlag ) )
+{
+
+  # if ONE argv received, it should be the path of the disk volume. Ie, /Volumes/NameOfDisk.
+  # If FOUR argv's are received, assume it's being called from Blast Image Config.
+  
   usage();  # Call subroutine usage()
-  exit(-1);   # When usage() has completed execution,
-            # exit the program.
+  exit(-1);   # When usage() has completed execution, exit the program.
+
+}
+
+# ----------------------------------------------------------
+# Support for only having to provide the path to the disk is coming soon, NOT YET...
+# ----------------------------------------------------------
+
+if ( @ARGV == 1 )
+{
+	print "This feature is not yet implemented. Soon!\n";
+	exit(1);
 }
 
 # ----------------------------------------------------------
@@ -91,6 +110,15 @@ my $RestoredDiskTotalBytes = $ARGV[3]; # 19731566592
 print "RestoredDiskDevPath = '$RestoredDiskDevPath'\n";
 
 my @lt = localtime(time);
+
+# ----------------------------------------------------------
+# Specify the path to the OS X 'Recovery HD' System Image:
+# ----------------------------------------------------------
+
+# Look for the 'RecoveryHD.dmg' Recovery HD disk image in the main BIC 'RestoreImages' Directory, one directory back from this script.
+# This path can be changed to anything that is valid in the terminal run with 'sudo' rights.
+my $recoveryHDdiskImageFileName = "RecoveryHD.dmg";
+my $recoveryHDdiskImagePath = dirname($0) . "/$recoveryHDdiskImageFileName";
 
 # ----------------------------------------------------------
 # Dump the data on the restored volume
@@ -260,7 +288,8 @@ exit(0);
 sub usage
 {
   print "ERROR: Minimum number of parameters not received.\n";
-  print "Usage: $programName RestoredDiskVolumePath IP RestoredDiskDevPath RestoredDiskTotalBytes\n";
+  print "Usage: $programName /Volumes/NameOfDiskToAddRecoveryPartitionTo\n";
+  print "Usage: $programName /Volumes/RestoredDiskVolumeName \"IP_OR_DHCP_STRING\" /dev/RestoredDiskDevID RestoredDiskTotalBytes\n";
 }
 
 sub generateLogFileName {
