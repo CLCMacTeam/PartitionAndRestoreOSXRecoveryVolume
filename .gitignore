@@ -1,0 +1,2 @@
+# Ignore all disk images in the same directory as this script:
+*.dmg
