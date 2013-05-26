@@ -60,7 +60,7 @@ my ( $dirName ) = dirname($0);
 my ( $fullPathToMe ) = $dirName . "\/" . $programName;
 my ( $recoveryHDdiskDevID ) = "";
 my ( $argvCountGoodFlag ) = 0; # FALSE
-my ( $onlyRecievedDiskVolumePath ) = 0; # FALSE
+my ( $onlyReceivedDiskVolumePath ) = 0; # FALSE
 
 $argc = @ARGV; # Get the number of command line parameters
 
@@ -68,13 +68,13 @@ if ( ( @ARGV == 1 ) || ( @ARGV == 4 ) )
 {
 
 	$argvCountGoodFlag = 1; # TRUE
-	$onlyRecievedDiskVolumePath = 1;
+	$onlyReceivedDiskVolumePath = 1;
 
 } else
 {
 
 	$argvCountGoodFlag = 0; # FALSE
-	$onlyRecievedDiskVolumePath = 0; # FALSE
+	$onlyReceivedDiskVolumePath = 0; # FALSE
 }
 
 if ( ! ( $argvCountGoodFlag ) )
@@ -86,16 +86,6 @@ if ( ! ( $argvCountGoodFlag ) )
   usage();  # Call subroutine usage()
   exit(-1);   # When usage() has completed execution, exit the program.
 
-}
-
-# ----------------------------------------------------------
-# Support for only having to provide the path to the disk is coming soon, NOT YET...
-# ----------------------------------------------------------
-
-if ( @ARGV == 1 )
-{
-	print "This feature is not yet implemented. Soon!\n";
-	exit(1);
 }
 
 # ----------------------------------------------------------
@@ -121,27 +111,48 @@ my $recoveryHDdiskImageFileName = "RecoveryHD.dmg";
 my $recoveryHDdiskImagePath = dirname($0) . "/$recoveryHDdiskImageFileName";
 
 # ----------------------------------------------------------
-# Dump the data on the restored volume
+# Get the $RestoredDiskDevPath and its parent disk dev ID:
 # ----------------------------------------------------------
 
-my $restoredSystemDiskData = system("/usr/sbin/diskutil info -plist " . $RestoredDiskDevPath) >> 8;
+my $diskToGetInfo = "";
+my $parentDiskID = "";
 
-if ($restoredSystemDiskData != 0)
+if ( $onlyReceivedDiskVolumePath )
 {
-	print "ERROR: Unable to obtain data on restored system disk. Not a critical error, continuing ...\n";
-}
-else
+
+	print "Determining dev ID of received disk volume path next...\n";
+	$diskToGetInfo = $RestoredDiskPath;
+	
+	# ----------------------------------------------------------
+	# Dump the data on the restored volume
+	# ----------------------------------------------------------
+
+	my $restoredSystemDiskData = system("/usr/sbin/diskutil info -plist " . $diskToGetInfo) >> 8;
+
+	if ($restoredSystemDiskData != 0)
+	{
+		print "ERROR: Unable to obtain data on restored system disk! Cannot continue, exiting.\n";
+		exit(1);
+	}
+	else
+	{
+		# Now get the output of the same exact command so we can parse it for the parent disk dev ID:
+		$restoredSystemDiskData = `/usr/sbin/diskutil info -plist $diskToGetInfo`;
+	}
+
+	$_=$restoredSystemDiskData;
+	/(\/dev\/)(.*)(s\d)(.*)/;
+	$parentDiskID=$2;
+	
+} else
 {
-	print "Successfully obtained data on the restored system disk located at '$RestoredDiskDevPath'\n";
+	print "Received the disk dev ID, using it...\n";	
+
+	$_=$RestoredDiskDevPath;
+	/(\/dev\/)(.*)(s)(.*)/;
+	$parentDiskID=$2;
+	
 }
-
-# ----------------------------------------------------------
-# Get the parent disk dev ID
-# ----------------------------------------------------------
-
-$_=$RestoredDiskDevPath;
-/(\/dev\/)(.*)(s)(.*)/;
-my $parentDiskID=$2;
 
 if ( $parentDiskID eq "")
 {
@@ -151,6 +162,16 @@ if ( $parentDiskID eq "")
 else
 {
 	print "Parent Disk Device ID = '$parentDiskID'\n";
+}
+
+# ----------------------------------------------------------
+# Support for only having to provide the path to the disk is coming soon, NOT YET...
+# ----------------------------------------------------------
+
+if ( @ARGV == 1 )
+{
+	print "This feature is not yet implemented. Soon!\n";
+	exit(1);
 }
 
 # ----------------------------------------------------------
@@ -183,7 +204,7 @@ my $existingRecoveryHDVolDiskIDresult=$2;
 
 print "existingRecoveryHDVolDiskIDresult = '$existingRecoveryHDVolDiskIDresult'\n";
 
-if ( $existingRecoveryHDVolDiskIDresult ne $parentDiskID)
+if ( ( $existingRecoveryHDVolDiskIDresult != "" ) && ( $existingRecoveryHDVolDiskIDresult ne $parentDiskID) )
 {
 	print "Found exiting 'Apple_Boot' Recovery HD partition, using it for the restore next ...\n";
 	$recoveryHDdiskDevID = "/dev/" . $existingRecoveryHDVolDiskIDresult;
