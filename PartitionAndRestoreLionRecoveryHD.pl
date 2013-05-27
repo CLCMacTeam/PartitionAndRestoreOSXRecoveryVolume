@@ -144,6 +144,68 @@ if ( $onlyReceivedDiskVolumePath )
 	/(\/dev\/)(.*)(s\d)(.*)/;
 	$parentDiskID=$2;
 	
+	# ----------------------------------------------------------
+	# Get the total number of bytes for the supplied disk volume path
+	# ----------------------------------------------------------
+
+	my $totalBytesOfReceivedDiskVolumeTmpLog = &generateLogFileName("totalBytesOfReceivedDiskVolumeTmpLog");	
+	my $totalBytesOfReceivedDiskVolume = system("/usr/sbin/diskutil info -plist " . $diskToGetInfo . " | /usr/bin/tee " . $totalBytesOfReceivedDiskVolumeTmpLog ) >> 8;
+
+	if ($totalBytesOfReceivedDiskVolume != 0)
+	{
+		print "ERROR: Unable to obtain details on the received disk volume path at '$diskToGetInfo'. Exiting.\n";
+		exit (-1);
+	}
+	else
+	{
+		print "Successfully obtained details on the received disk volume path at '$diskToGetInfo'.\n";
+	}
+	
+	my $totalBytesOfReceivedDiskVolumeResult = `/usr/bin/grep -A 1 TotalSize $totalBytesOfReceivedDiskVolumeTmpLog`;
+		
+	$totalBytesOfReceivedDiskVolumeResult =~ s/\s+//g; # Remove all white space characters
+
+	$_=$totalBytesOfReceivedDiskVolumeResult;
+	/(\<key\>TotalSize\<\/key\>\<integer\>)(\d*)/;
+
+	my $totalBytesOfReceivedDiskVolumeResult=$2;
+
+	if ( ( $totalBytesOfReceivedDiskVolumeResult == '' ) || ($totalBytesOfReceivedDiskVolumeResult == 0 ) )
+	{
+		print "ERROR: Failed to obtain the total number of bytes for the disk volume, exiting.";
+		exit(1);
+	}
+	else
+	{	
+		$RestoredDiskTotalBytes = $totalBytesOfReceivedDiskVolumeResult;
+	}
+
+	print "Total number of bytes for the disk volume at '$diskToGetInfo' = $RestoredDiskTotalBytes\n";
+	
+	# ----------------------------------------------------------
+	# Get the $RestoredDiskDevPath for the received disk volume path:
+	# ----------------------------------------------------------
+
+	my $DeviceIDofReceivedDiskVolumeResult = `/usr/bin/grep -A 1 DeviceIdentifier $totalBytesOfReceivedDiskVolumeTmpLog`;
+	$DeviceIDofReceivedDiskVolumeResult =~ s/\s+//g; # Remove all white space characters
+	
+	$_=$DeviceIDofReceivedDiskVolumeResult;
+	/(\<key\>DeviceIdentifier\<\/key\>\<string\>)(.*)(\<\/string\>)/;
+
+	$DeviceIDofReceivedDiskVolumeResult=$2;
+	
+	print "**** DeviceIDofReceivedDiskVolumeResult = '$DeviceIDofReceivedDiskVolumeResult'\n";	
+
+	if ( $DeviceIDofReceivedDiskVolumeResult eq "" )
+	{
+		print "ERROR: Failed to obtain the device ID of the received disk volume path, exiting.\n";
+		exit(1);
+	}
+	else
+	{	
+		$RestoredDiskDevPath = $DeviceIDofReceivedDiskVolumeResult;
+	}
+	
 } else
 {
 	print "Received the disk dev ID, using it...\n";	
@@ -162,16 +224,6 @@ if ( $parentDiskID eq "")
 else
 {
 	print "Parent Disk Device ID = '$parentDiskID'\n";
-}
-
-# ----------------------------------------------------------
-# Support for only having to provide the path to the disk is coming soon, NOT YET...
-# ----------------------------------------------------------
-
-if ( @ARGV == 1 )
-{
-	print "This feature is not yet implemented. Soon!\n";
-	exit(1);
 }
 
 # ----------------------------------------------------------
@@ -296,7 +348,7 @@ if ( $asrChangePartitionType != 0 )
 
 # If we've made it this far, assume everything worked!
 
-print "\n*** End of $0. ***\n";
+print "\n*** Successfully created and restored the Recovery HD volume! End of $0. ***\n";
 
 exit(0);
 
