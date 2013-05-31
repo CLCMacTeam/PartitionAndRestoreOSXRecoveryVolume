@@ -269,6 +269,28 @@ elsif ( &createNewAppleBootPartition() != 0 )
 }
 
 # ----------------------------------------------------------
+# Forcefully unmount the new partition, ask it sometimes fails to unmount correctly for ASR:
+# ----------------------------------------------------------
+
+my $forceUnmountNewPartition = system("/usr/sbin/diskutil unmount force " . $recoveryHDdiskDevID);
+
+if ($forceUnmountNewPartition != 0)
+{
+	print "ERROR: Failed to unmount the new disk partition! Exiting.\n";
+	exit (-1);
+}
+else
+{
+	print "Successfully unmounted the new disk partition at $recoveryHDdiskDevID.\n";
+}
+
+# sleep for 5 seconds to give the system time to update the disks arbitration:
+
+print "Sleeping for 5 seconds to wait for disk arbitration to settle down ...\n";
+
+sleep(5);
+
+# ----------------------------------------------------------
 # Restore the imaged 'Recovery HD' disk image via ASR:
 # asr restore --source 10.7.0-Recovery-HD.dmg --target /dev/disk0s4 -erase --noprompt
 #	Validating target...done
@@ -454,7 +476,24 @@ sub createNewAppleBootPartition {
 	}
 	
 	print "Restore Disk Device ID path is '$recoveryHDdiskDevID'\n";
-
+	
+	# Turn off spotlight indexing on the new partition next:
+	
+	my $DisableSpotlight = system("/usr/bin/mdutil -i off /Volumes/" . $recoveryHDtempVolName );
+	
+	# need to get the return value in addition to the exit value here...
+	
+	if ( $DisableSpotlight != 0 )
+	{
+		print "ERROR! Failed to disable spotlight indexing on the new partition. Exiting.\n";
+		print "createNewAppleBootPartition() : <----\n";
+		return (-1);
+	}
+	else
+	{
+		print "Successfully disabled spotlight indexing on the new partition.\n";
+	}
+	
 	print "createNewAppleBootPartition() : <----\n";
 	return (0);
 
