@@ -122,6 +122,7 @@ if ( $onlyReceivedDiskVolumePath )
 
 	print "Determining dev ID of received disk volume path next...\n";
 	$diskToGetInfo = $RestoredDiskPath;
+	$diskToGetInfo=~s/ /\\ /g; # Delimit the spaces
 	
 	# ----------------------------------------------------------
 	# Dump the data on the restored volume
