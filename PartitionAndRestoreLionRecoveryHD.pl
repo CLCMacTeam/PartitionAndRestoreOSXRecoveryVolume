@@ -64,7 +64,7 @@ my ( $onlyReceivedDiskVolumePath ) = 0; # FALSE
 
 $argc = @ARGV; # Get the number of command line parameters
 
-if ( ( @ARGV == 1 ) || ( @ARGV == 4 ) )
+if ( ( @ARGV == 1 ) || ( @ARGV == 5 ) )
 {
 
 	$argvCountGoodFlag = 1; # TRUE
@@ -81,7 +81,7 @@ if ( ! ( $argvCountGoodFlag ) )
 {
 
   # if ONE argv received, it should be the path of the disk volume. Ie, /Volumes/NameOfDisk.
-  # If FOUR argv's are received, assume it's being called from Blast Image Config.
+  # If FIVE argv's are received, assume it's being called from Blast Image Config.
   
   usage();  # Call subroutine usage()
   exit(-1);   # When usage() has completed execution, exit the program.
@@ -96,6 +96,7 @@ my $RestoredDiskPath = $ARGV[0]; # /Volumes/SL Mac HD
 my $ip_address = $ARGV[1]; # "DHCP", "123.123.123.123"
 my $RestoredDiskDevPath = $ARGV[2]; # /dev/disk0s5
 my $RestoredDiskTotalBytes = $ARGV[3]; # 19731566592
+my $recoverHDBytes = $ARGV[4]; # 650002432
 
 print "RestoredDiskDevPath = '$RestoredDiskDevPath'\n";
 
@@ -413,7 +414,11 @@ sub createNewAppleBootPartition {
 	# Calculate the new resize value to add the 'Recovery HD' Volume:
 	# ----------------------------------------------------------
 	
-	my $recoverHDBytes = 650002432; # At least 650 MB. 650002432 = exactly 1269536 512-Byte-Blocks.
+	if ( $recoverHDBytes eq "" )
+	{
+		print "ERROR: Failed to find the size for the recovery volume. Using 650 MB.\n";
+		my $recoverHDBytes = 650002432; # At least 650 MB. 650002432 = exactly 1269536 512-Byte-Blocks.
+	}
 	print "recoverHDBytes = $recoverHDBytes (Even number of 512-Byte-Blocks, standard disk block size.)\n";
 	
 	if ($RestoredDiskTotalBytes < $recoverHDBytes)
