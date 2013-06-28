@@ -417,9 +417,10 @@ sub createNewAppleBootPartition {
 	if ( $recoverHDBytes eq "" )
 	{
 		print "ERROR: Failed to find the size for the recovery volume. Using 650 MB.\n";
-		my $recoverHDBytes = 650002432; # At least 650 MB. 650002432 = exactly 1269536 512-Byte-Blocks.
+		$recoverHDBytes = 650002432; # At least 650 MB. 650002432 = exactly 1269536 512-Byte-Blocks.
 	}
-	print "recoverHDBytes = $recoverHDBytes (Even number of 512-Byte-Blocks, standard disk block size.)\n";
+
+	print "recoverHDBytes = '$recoverHDBytes' (Even number of 512-Byte-Blocks, standard disk block size.)\n";
 	
 	if ($RestoredDiskTotalBytes < $recoverHDBytes)
 	{
