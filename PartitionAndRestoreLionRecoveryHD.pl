@@ -96,7 +96,7 @@ my $RestoredDiskPath = $ARGV[0]; # /Volumes/SL Mac HD
 my $ip_address = $ARGV[1]; # "DHCP", "123.123.123.123"
 my $RestoredDiskDevPath = $ARGV[2]; # /dev/disk0s5
 my $RestoredDiskTotalBytes = $ARGV[3]; # 19731566592
-my $recoverHDBytes = $ARGV[4]; # 650002432
+my $recoveryHDBytes = $ARGV[4]; # 650002432
 
 print "RestoredDiskDevPath = '$RestoredDiskDevPath'\n";
 
@@ -386,7 +386,7 @@ sub usage
 {
   print "ERROR: Minimum number of parameters not received.\n";
   print "Usage: $programName /Volumes/NameOfDiskToAddRecoveryPartitionTo\n";
-  print "Usage: $programName /Volumes/RestoredDiskVolumeName \"IP_OR_DHCP_STRING\" /dev/RestoredDiskDevID RestoredDiskTotalBytes\n";
+  print "Usage: $programName /Volumes/RestoredDiskVolumeName \"IP_OR_DHCP_STRING\" /dev/RestoredDiskDevID RestoredDiskTotalBytes [RecoveryPartitionSizeInBytes]\n";
 }
 
 sub generateLogFileName {
@@ -414,22 +414,22 @@ sub createNewAppleBootPartition {
 	# Calculate the new resize value to add the 'Recovery HD' Volume:
 	# ----------------------------------------------------------
 	
-	if ( $recoverHDBytes eq "" )
+	if ( $recoveryHDBytes eq "" )
 	{
 		print "ERROR: Failed to find the size for the recovery volume. Using 650 MB.\n";
-		$recoverHDBytes = 650002432; # At least 650 MB. 650002432 = exactly 1269536 512-Byte-Blocks.
+		$recoveryHDBytes = 650002432; # At least 650 MB. 650002432 = exactly 1269536 512-Byte-Blocks.
 	}
 
-	print "recoverHDBytes = '$recoverHDBytes' (Even number of 512-Byte-Blocks, standard disk block size.)\n";
+	print "recoveryHDBytes = '$recoveryHDBytes' (Even number of 512-Byte-Blocks, standard disk block size.)\n";
 	
-	if ($RestoredDiskTotalBytes < $recoverHDBytes)
+	if ($RestoredDiskTotalBytes < $recoveryHDBytes)
 	{
-		print "ERROR: There is not enough space on the restored disk ($RestoredDiskTotalBytes bytes) to create a 650 MB ($recoverHDBytes bytes) Recovery HD partition. Exiting...\n";
+		print "ERROR: There is not enough space on the restored disk ($RestoredDiskTotalBytes bytes) to create a 650 MB ($recoveryHDBytes bytes) Recovery HD partition. Exiting...\n";
 		print "createNewAppleBootPartition() : <----\n";
 		return (-1);
 	}
 	
-	my $newMainPartitionSizeInBytes = $RestoredDiskTotalBytes - $recoverHDBytes;
+	my $newMainPartitionSizeInBytes = $RestoredDiskTotalBytes - $recoveryHDBytes;
 	print "newMainPartitionSizeInBytes = $newMainPartitionSizeInBytes\n";
 	
 	# ----------------------------------------------------------
