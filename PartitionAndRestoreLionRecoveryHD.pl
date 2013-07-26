@@ -64,7 +64,7 @@ my ( $onlyReceivedDiskVolumePath ) = 0; # FALSE
 
 $argc = @ARGV; # Get the number of command line parameters
 
-if ( ( @ARGV == 1 ) || ( @ARGV == 5 ) )
+if ( ( @ARGV == 1 ) || ( @ARGV == 4 ) || ( @ARGV == 5 ) )
 {
 
 	$argvCountGoodFlag = 1; # TRUE
@@ -106,10 +106,14 @@ my @lt = localtime(time);
 # Specify the path to the OS X 'Recovery HD' System Image:
 # ----------------------------------------------------------
 
-# Look for the 'RecoveryHD.dmg' Recovery HD disk image in the main BIC 'RestoreImages' Directory, one directory back from this script.
-# This path can be changed to anything that is valid in the terminal run with 'sudo' rights.
 my $recoveryHDdiskImageFileName = "RecoveryHD.dmg";
+
+# Look for the Recovery HD disk image in the same directory as this script:
 my $recoveryHDdiskImagePath = dirname($0) . "/$recoveryHDdiskImageFileName";
+
+# For Blast Image Config System Admins, look for the 'RecoveryHD.dmg' Recovery HD disk image
+# in the main BIC 'RestoreImages' Directory, one directory back from this script:
+# my $recoveryHDdiskImagePath = dirname($0) . "/../RestoreImages/$recoveryHDdiskImageFileName";
 
 # ----------------------------------------------------------
 # Get the $RestoredDiskDevPath and its parent disk dev ID:
