@@ -25,7 +25,9 @@ print "***\n$0 Script starting...\n";
 
 if ( $< != 0 ) # $< = effective user id (euid)
 {
-        print "Sorry, but this script must be executed via 'sudo' or as the root user. Exiting.\n***\n";
+        print "Sorry, but this script must be executed via 'sudo' or as the root user:\n\n";
+    	usage();  # Call subroutine usage()
+        print "\nExiting.\n***\n";
         exit -1;
 }
 
@@ -82,8 +84,10 @@ if ( ! ( $argvCountGoodFlag ) )
 
   # if ONE argv received, it should be the path of the disk volume. Ie, /Volumes/NameOfDisk.
   # If FIVE argv's are received, assume it's being called from Blast Image Config.
-  
+
+  print "\nERROR! Minimum number of parameters not received:\n\n";  
   usage();  # Call subroutine usage()
+  print "\nExiting.\n***\n";  
   exit(-1);   # When usage() has completed execution, exit the program.
 
 }
@@ -388,9 +392,8 @@ exit(0);
 	
 sub usage
 {
-  print "ERROR: Minimum number of parameters not received.\n";
-  print "Usage: $programName /Volumes/NameOfDiskToAddRecoveryPartitionTo\n";
-  print "Usage: $programName /Volumes/RestoredDiskVolumeName \"IP_OR_DHCP_STRING\" /dev/RestoredDiskDevID RestoredDiskTotalBytes [RecoveryPartitionSizeInBytes]\n";
+  print "Usage: sudo ./$programName /Volumes/NameOfDiskToAddRecoveryPartitionTo\n";
+  print "Usage: sudo ./$programName /Volumes/RestoredDiskVolumeName \"IP_OR_DHCP_STRING\" /dev/RestoredDiskDevID RestoredDiskTotalBytes [RecoveryPartitionSizeInBytes]\n";
 }
 
 sub generateLogFileName {
