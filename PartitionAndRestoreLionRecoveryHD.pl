@@ -110,14 +110,45 @@ my @lt = localtime(time);
 # Specify the path to the OS X 'Recovery HD' System Image:
 # ----------------------------------------------------------
 
+print "--\n";
+print "Looking for the Recovery Volume system disk image next ...\n\n";
+
 my $recoveryHDdiskImageFileName = "RecoveryHD.dmg";
 
 # Look for the Recovery HD disk image in the same directory as this script:
 my $recoveryHDdiskImagePath = dirname($0) . "/$recoveryHDdiskImageFileName";
 
-# For Blast Image Config System Admins, look for the 'RecoveryHD.dmg' Recovery HD disk image
-# in the main BIC 'RestoreImages' Directory, one directory back from this script:
-# my $recoveryHDdiskImagePath = dirname($0) . "/../RestoreImages/$recoveryHDdiskImageFileName";
+if ( ! ( -e $recoveryHDdiskImagePath ) || ( -d $recoveryHDdiskImagePath ) )
+{
+	
+	print "ERROR: Failed to locate the Recovery Volume System Image at ";
+	print "the path of '$recoveryHDdiskImagePath', or it's not a valid file.\n\n";
+	print "Looking in the parent directory next ...\n\n";
+	
+	# The Recovery System File doesn't exist in the current directory as this script,
+	# Or it's a directory which isn't valid.
+
+	# For Blast Image Config System Admins, look for the 'RecoveryHD.dmg' Recovery HD disk image
+	# in the main BIC 'RestoreImages' Directory, one directory back from this script:
+
+	$recoveryHDdiskImagePath = dirname($0) . "/../RestoreImages/$recoveryHDdiskImageFileName";
+
+	if ( ( -e $recoveryHDdiskImagePath ) && ( ! ( -d $recoveryHDdiskImagePath ) ) )
+	{
+		print "Found the Recovery System Image at the path of '$recoveryHDdiskImagePath'.\n\n";
+	}
+	else
+	{
+		print "ERROR: Failed to locate the Recovery Volume system disk image ";
+		print "at the path of '$recoveryHDdiskImagePath', or it's not a valid file.\n";
+		exit -1;
+	}
+
+}
+
+print "Using the Recovery System Disk Image file at the path of '$recoveryHDdiskImagePath' ...\n";
+
+print "--\n";
 
 # ----------------------------------------------------------
 # Get the $RestoredDiskDevPath and its parent disk dev ID:
