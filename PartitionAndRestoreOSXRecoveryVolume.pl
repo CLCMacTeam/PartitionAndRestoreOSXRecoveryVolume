@@ -406,6 +406,7 @@ my $asrChangePartitionType = system("/usr/sbin/asr adjust --target " . $recovery
 if ( $asrChangePartitionType != 0 )
 {
 	print "ERROR! Failed to restore the Mac OS X hidden 'Recovery HD' volume. Exiting.\n";
+	print "ERROR! Failed to change the partition type to 'Apple_Boot' on the hidden 'Recovery HD' volume. Exiting.\n";
 	exit(-1);	
 }
 
