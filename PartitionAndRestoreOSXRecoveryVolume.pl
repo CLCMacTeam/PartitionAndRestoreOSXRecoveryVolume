@@ -297,7 +297,7 @@ my $existingRecoveryHDVolDiskIDresult=$2;
 
 print "existingRecoveryHDVolDiskIDresult = '$existingRecoveryHDVolDiskIDresult'\n";
 
-if ( ( $existingRecoveryHDVolDiskIDresult != "" ) && ( $existingRecoveryHDVolDiskIDresult ne $parentDiskID) )
+if ( !( $existingRecoveryHDVolDiskIDresult eq '' ) && ( $existingRecoveryHDVolDiskIDresult ne $parentDiskID) )
 {
 	print "Found exiting 'Apple_Boot' Recovery HD partition, using it for the restore next ...\n";
 	$recoveryHDdiskDevID = "/dev/" . $existingRecoveryHDVolDiskIDresult;
