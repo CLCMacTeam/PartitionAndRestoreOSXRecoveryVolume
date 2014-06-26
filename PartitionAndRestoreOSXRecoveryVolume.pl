@@ -299,8 +299,36 @@ print "existingRecoveryHDVolDiskIDresult = '$existingRecoveryHDVolDiskIDresult'\
 
 if ( !( $existingRecoveryHDVolDiskIDresult eq '' ) && ( $existingRecoveryHDVolDiskIDresult ne $parentDiskID) )
 {
-	print "Found exiting 'Apple_Boot' Recovery HD partition, using it for the restore next ...\n";
+	
+	print "Found the exiting 'Apple_Boot' Recovery HD partition, preparing and using it for the restore ...\n";
 	$recoveryHDdiskDevID = "/dev/" . $existingRecoveryHDVolDiskIDresult;
+		
+	# Change the partition type back to 'Apple_HFS', which is required for ASR or it will fail (on 10.9):
+	
+	print "Changing the partition type of the existing Recovery HD volume  back to 'Apple_HFS' ...\n";
+		
+	my $asrChangePartitionType = system("/usr/sbin/asr adjust --target " . $recoveryHDdiskDevID . " -settype \"Apple_HFS\"" ) >> 8;
+
+	if ( $asrChangePartitionType != 0 )
+	{
+		print "ERROR! Failed to change the partition type to 'Apple_HFS' on the existing 'Recovery HD' volume. Exiting.\n";
+		exit(-1);	
+	}
+	
+	# Mount the existing partition:
+	
+	print "Mounting the existing Recovery HD volume ...\n";
+	
+	my $mountRecoveryHDVolume = system("/usr/sbin/diskutil mount " . $recoveryHDdiskDevID ) >> 8;
+
+	sleep(5);
+		
+	if ( $mountRecoveryHDVolume != 0 )
+	{
+		print "ERROR! Failed to mount the existing 'Recovery HD'. Exiting.\n";
+		exit(-1);	
+	}
+
 }
 elsif ( &createNewAppleBootPartition() != 0 )
 {
