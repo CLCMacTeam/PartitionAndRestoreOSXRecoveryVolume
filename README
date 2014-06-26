@@ -1,7 +1,12 @@
-I originally developed this script to run as a 'Post-Restore-Script' for PSU Blast Image Config, which I'm the lead developer of here:
+Script Purpose:
 
-	<http://clc.its.psu.edu/UnivServices/itadmins/mac/blastimageconfig>
+This script is intended to run after the main system image has been restored, then create (if one doesn't already exist) a new 650 MB 'Recovery HD' partition, restore a pre-existing Recovery HD system disk image, and then change the partition type to 'Apple_Boot' via ASR's 'adjust' verb.
 
+The script requires numerous input arguements, which are documented in the script's usage subroutine. The script must be run with sudo or as the root user.
+
+You do not need to use this script if your master system image includes the 'Recovery HD' partition in it. You will end up with this type of system image if you create a system image from an entire disk versus the "From Folder" with Disk Utility or AutoDMG.
+
+If you make any cool/useful changes to this script please fork this repo and submit a pull request!
 
 System Requirements:
 
@@ -9,19 +14,6 @@ System Requirements:
 
 - Mac OS X 10.7 (Lion) or later.
 
-- A disk image of the Lion hidden 'Recovery HD' volume. Documentation on how to create it is located here: 
+- A disk image of the OS X 'Recovery HD' volume. Documentation on how to create it is located here: 
 
-		<http://clc.its.psu.edu/UnivServices/itadmins/mac/blastimageconfig/createasrrecoveryhdimage10.7>
-
-
-Purpose:
-
-This script does not require the use of PSU Blast Image Config, and can easily be adapted to different environments on OS X.
-
-It's intended to run after the main system image has been restored, then create (if one doesn't already exist) a new 650 MB 'Recovery HD' partition, restore a pre-existing Recovery HD system disk image, and then change the partition type to 'Apple_Boot' via asr's 'adjust' verb.
-
-The script requires numerous input arguements, which are documented in the script's usage subroutine. The script must be run with sudo or as the root user.
-
-If you make any cool/useful changes to this script, I'm always interested in hearing about them!
-
-- Justin Elliott
+		<http://clc.its.psu.edu/UnivServices/itadmins/mac/blastimageconfig/createmasterdiskimages>
