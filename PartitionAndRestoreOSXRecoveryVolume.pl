@@ -370,9 +370,9 @@ sleep(5);
 #	Remounting target volume...done
 # ----------------------------------------------------------
 
-print "recoveryHDdiskImagePath = '$recoveryHDdiskImagePath'\n";
+print "Starting ASR restore of the `$recoveryHDdiskImagePath' system image to the new/existing partition at '$recoveryHDdiskDevID' ...\n";
 
-my $asrRestoreRecoveryHDvolume = system("/usr/sbin/asr --source \"" . $recoveryHDdiskImagePath . "\" --target " . $recoveryHDdiskDevID . " -erase --noprompt" ) >> 8;
+my $asrRestoreRecoveryHDvolume = system("/usr/sbin/asr restore --source \"" . $recoveryHDdiskImagePath . "\" --target " . $recoveryHDdiskDevID . " --erase --noprompt" ) >> 8;
 
 if ( $asrRestoreRecoveryHDvolume != 0 )
 {
