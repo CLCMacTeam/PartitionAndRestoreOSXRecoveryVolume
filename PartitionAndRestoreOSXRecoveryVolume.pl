@@ -397,7 +397,7 @@ if ( $recoveryHDdiskDevIDumountCheck != 0 )
 }
 else
 {
-	print "Successfully obtain data on the disk located at $recoveryHDdiskDevID.\n";
+	print "Successfully obtained data on the disk located at $recoveryHDdiskDevID.\n";
 }
 
 $recoveryHDdiskDevIDumountCheck = `/usr/libexec/PlistBuddy -c "print MountPoint" $recoveryHDdiskDevIDumountCheckTmpLog`;
@@ -405,7 +405,7 @@ chomp($recoveryHDdiskDevIDumountCheck); # remove any hard returns
 
 if ($recoveryHDdiskDevIDumountCheck eq "")
 {
-	print "The disk located at /dev/$recoveryHDdiskDevID is not mounted. No need to force an unmount, continuing ...\n";
+	print "The disk located at $recoveryHDdiskDevID is not mounted. No need to force an unmount, continuing ...\n";
 }
 else
 {
